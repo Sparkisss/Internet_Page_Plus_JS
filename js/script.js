@@ -35,6 +35,9 @@ window.addEventListener('DOMContentLoaded', () => {
             };
           });
 
+
+          /////////////////////////////////////////////////////
+
           btn.addEventListener('click', myAnimation);
          
 
@@ -54,16 +57,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
             }
           }
-
-        //   function logger() {
-        //     alert('Bro, you shoud follow me!');
-        //   };
-
-        //   let id = setTimeout(function log() {
-        //     console.log('Hello');
-        //     id =setTimeout(log, 500);
-        //   },500);
-
+        
           tabElementRemove();
           rabElementShow();
 });
