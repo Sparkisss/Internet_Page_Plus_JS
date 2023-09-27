@@ -1,3 +1,4 @@
+'use strict'
 window.addEventListener('DOMContentLoaded', () => {
     const parentElement = document.querySelector(".tabheader__items"),
           tabContent = document.querySelectorAll(".tabcontent"),
@@ -34,12 +35,8 @@ window.addEventListener('DOMContentLoaded', () => {
                 });
             };
           });
-
-
           /////////////////////////////////////////////////////
-
-          btn.addEventListener('click', myAnimation);
-         
+          btn.addEventListener('click', myAnimation);         
 
           function myAnimation() {
             const logo = document.querySelector('.header__link');
@@ -56,8 +53,19 @@ window.addEventListener('DOMContentLoaded', () => {
                     logo.style.fontSize = pos + 'px';
                 }
             }
-          }
-        
+          }        
           tabElementRemove();
           rabElementShow();
+
+          let start = new Date();
+
+          for (let i = 0; i < 7000000; i++) {
+            let some = i ** 3;
+          };
+
+          let end = new Date();
+
+          alert(`Цикл отработал за ${end - start} second`);
+
+
 });
