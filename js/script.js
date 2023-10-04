@@ -35,28 +35,10 @@ window.addEventListener('DOMContentLoaded', () => {
                     };                    
                 });
             };
-          });
-         //////////////////////////////My style//////////////////////////////
-          btn.addEventListener('click', myAnimation);         
-
-          function myAnimation() {
-            const logo = document.querySelector('.header__link');
-            
-            let pos = 0;
-            const id = setInterval(frame, 30);
-            function frame() {
-                if (pos == 20){
-                    clearInterval(id);
-                    
-                }else {
-                    console.log('ds');
-                    pos++;
-                    logo.style.fontSize = pos + 'px';
-                }
-            }
-          }        
+          });             
           tabElementRemove();
           rabElementShow();
+
           //////////////////////////////Timer//////////////////////////////
 
           const deadLine = '2023-11-01';
@@ -116,6 +98,56 @@ window.addEventListener('DOMContentLoaded', () => {
       };
 
       setClock('.timer', deadLine);
+
+//////////////////////////////Modal window//////////////////////////////
+const modalBtn = document.querySelectorAll('[data-modal]'),
+      modal = document.querySelector('.modal'),
+      modalClose = document.querySelector('[data-close]');
+
+const modalTimer = setTimeout(showModalWindow, 3000);
+
+
+      modalBtn.forEach(btn => {
+        btn.addEventListener('click', showModalWindow);
+      });
+
+      modalClose.addEventListener('click', hiddenModalWindow);
+
+      document.addEventListener("keydown", function(event) {
+        if (event.key === "Escape" && modal.classList.contains('show')) {
+          hiddenModalWindow();
+        };
+      });
+      
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) hiddenModalWindow();
+      });
+
+      function showModalWindow() {
+        modal.classList.add("show");
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        clearInterval(modalTimer);
+      };
+
+      function hiddenModalWindow() {
+        modal.classList.add('hidden');
+        modal.classList.remove("show");
+        document.body.style.overflow = '';
+      };
+
+      function showModalWindowByScroll() {
+        if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight - 1) {
+          showModalWindow();
+          window.removeEventListener('scroll', showModalWindowByScroll);
+        };
+      };
+
+      window.addEventListener('scroll', showModalWindowByScroll);
+
+
+
+
 
 
 
