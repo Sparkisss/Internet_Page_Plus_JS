@@ -101,17 +101,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
 //////////////////////////////Modal window//////////////////////////////
 const modalBtn = document.querySelectorAll('[data-modal]'),
-      modal = document.querySelector('.modal'),
-      modalClose = document.querySelector('[data-close]');
+      modal = document.querySelector('.modal');
+    
 
 // const modalTimer = setTimeout(showModalWindow, 3000);
 
 
       modalBtn.forEach(btn => {
         btn.addEventListener('click', showModalWindow);
-      });
-
-      modalClose.addEventListener('click', hiddenModalWindow);
+      });      
 
       document.addEventListener("keydown", function(event) {
         if (event.key === "Escape" && modal.classList.contains('show')) {
@@ -120,7 +118,7 @@ const modalBtn = document.querySelectorAll('[data-modal]'),
       });
       
       modal.addEventListener('click', (e) => {
-        if (e.target === modal) hiddenModalWindow();
+        if (e.target === modal || e.target.getAttribute('data-close') == '') hiddenModalWindow();
       });
 
       function showModalWindow() {
@@ -221,7 +219,7 @@ class MenuCard {
 
     const forms = document.querySelectorAll('form');
     const message = {
-        loading: 'Загрузка...',
+        loading: 'img/form/spinner.svg',
         success: 'Спасибо! Скоро мы с вами свяжемся',
         failure: 'Что-то пошло не так...'
     };
@@ -234,10 +232,14 @@ class MenuCard {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
-            let statusMessage = document.createElement('div');
-            statusMessage.classList.add('status');
-            statusMessage.textContent = message.loading;
-            form.appendChild(statusMessage);
+            const statusMessage = document.createElement('img');
+            statusMessage.src = message.loading;
+            statusMessage.style.cssText = `
+              display: block;
+              margin: 0 auto;
+            `;
+            
+            form.insertAdjacentElement('afterend', statusMessage);
         
             const request = new XMLHttpRequest();
             request.open('POST', 'server.php');
@@ -255,19 +257,39 @@ class MenuCard {
             request.addEventListener('load', () => {
                 if (request.status === 200) {
                     console.log(request.response);
-                    statusMessage.textContent = message.success;
-                    form.reset();
-                    setTimeout(() => {
-                        statusMessage.remove();
-                    }, 2000);
+                    showThanskModal(message.success);
+                    form.reset();                    
+                    statusMessage.remove();                    
                 } else {
-                    statusMessage.textContent = message.failure;
+                  showThanskModal(message.failure);
                 }
             });
         });
     }
 
 
+    function showThanskModal(message) {
+      const prevModalDialog = document.querySelector('.modal__dialog');
+
+      prevModalDialog.classList.add('hide');
+      showModalWindow()
+
+      const thanksModal = document.createElement('div');
+      thanksModal.classList.add('modal__dialog');
+      thanksModal.innerHTML = `
+        <div class="modal__content">
+          <div class="modal__close" data-close>x</div>
+          <div class="modal__title">${message}</div>
+        </div>      
+      `;
+      document.querySelector('.modal').append(thanksModal);
+      setTimeout(() => {
+        thanksModal.remove();
+        prevModalDialog.classList.add('show');
+        prevModalDialog.classList.remove('hide');
+        hiddenModalWindow();
+      }, 4000);
+    }
 
 
 
