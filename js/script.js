@@ -216,6 +216,7 @@ class MenuCard {
       'menu__item',
     ).render();
 
+//////////////////////////////Requests//////////////////////////////
 
     const forms = document.querySelectorAll('form');
     const message = {
@@ -232,38 +233,38 @@ class MenuCard {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
-            const statusMessage = document.createElement('img');
+            let statusMessage = document.createElement('img');
             statusMessage.src = message.loading;
             statusMessage.style.cssText = `
               display: block;
               margin: 0 auto;
             `;
             
-            form.insertAdjacentElement('afterend', statusMessage);
-        
-            const request = new XMLHttpRequest();
-            request.open('POST', 'server.php');
-            request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            form.insertAdjacentElement('afterend', statusMessage);    
+                        
             const formData = new FormData(form);
 
             const object = {};
             formData.forEach(function(value, key){
                 object[key] = value;
-            });
-            const json = JSON.stringify(object);
+            });            
 
-            request.send(json);
-
-            request.addEventListener('load', () => {
-                if (request.status === 200) {
-                    console.log(request.response);
-                    showThanskModal(message.success);
-                    form.reset();                    
-                    statusMessage.remove();                    
-                } else {
-                  showThanskModal(message.failure);
-                }
-            });
+            fetch('server.php', {
+              method: "POST",
+              headers: {
+                'Content-type': 'application/json'
+              },
+              body: JSON.stringify(object)
+            })            
+            .then(data => {
+                console.log(data);
+                showThanskModal(message.success);                                  
+                statusMessage.remove();
+            }).catch(() => {
+              showThanskModal(message.failure);
+            }).finally(() => {
+              form.reset();
+            });            
         });
     }
 
@@ -290,6 +291,15 @@ class MenuCard {
         hiddenModalWindow();
       }, 4000);
     }
+
+//////////////////////////////NPM//////////////////////////////
+
+fetch('http://localhost:3000/menu  ')
+    .then(data => data.json())
+    .then(res => console.log(res));
+
+
+
 
 
 
