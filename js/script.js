@@ -18,7 +18,7 @@ window.addEventListener('DOMContentLoaded', () => {
             });
           };
 
-          function rabElementShow(i = 0) {
+          function tabElementShow(i = 0) {
             tabContent[i].classList.add('show', 'fade');
             tabContent[i].classList.remove('hide');
             tabInfo[i].classList.add('tabheader__item_active');
@@ -31,13 +31,13 @@ window.addEventListener('DOMContentLoaded', () => {
                 tabInfo.forEach((item, i) => {
                     if(target === item) {
                         tabElementRemove();
-                        rabElementShow(i);
+                        tabElementShow(i);
                     };                    
                 });
             };
           });             
           tabElementRemove();
-          rabElementShow();
+          tabElementShow();
 
           //////////////////////////////Timer//////////////////////////////
 
@@ -105,7 +105,6 @@ const modalBtn = document.querySelectorAll('[data-modal]'),
     
 
 // const modalTimer = setTimeout(showModalWindow, 3000);
-
 
       modalBtn.forEach(btn => {
         btn.addEventListener('click', showModalWindow);
@@ -185,36 +184,21 @@ class MenuCard {
   }
 }
 
-    new MenuCard(
-      "img/tabs/vegy.jpg",
-      "vegy",
-      'Меню "Фитнес"',
-      'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-      9,
-      '.menu .container',
-      'menu__item',
-      'big',
-    ).render();
+    const getResource = async (url) => {
+      const res = await fetch(url);
+      
+      if (!res.ok) {
+        throw new Error(`Could not fetch ${url}, status: ${res.status}`); 
+      }
+      return await res.json();
+    };
 
-    new MenuCard(
-      "img/tabs/elite.jpg",
-      "elite",
-      'Меню “Премиум”',
-      'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-      19,
-      '.menu .container',
-      'menu__item',
-    ).render();
-
-    new MenuCard(
-      "img/tabs/post.jpg",
-      "post",
-      'Меню "Постное"',
-      'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-      12,
-      '.menu .container',
-      'menu__item',
-    ).render();
+    getResource('http://localhost:3000/menu')
+      .then(data => {
+        data.forEach(({img, altimg, title, descr, price}) => {
+          new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+        });
+      });    
 
 //////////////////////////////Requests//////////////////////////////
 
@@ -226,10 +210,21 @@ class MenuCard {
     };
 
     forms.forEach(item => {
-        postData(item);
+      bindPostData(item);
     });
 
-    function postData(form) {
+    const postData = async (url, data) => {
+      const res = await fetch(url, {
+        method: "POST",
+              headers: {
+                'Content-type': 'application/json'
+              },
+              body: data
+      });
+      return await res.json();
+    };
+
+    function bindPostData(form) {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
@@ -244,18 +239,9 @@ class MenuCard {
                         
             const formData = new FormData(form);
 
-            const object = {};
-            formData.forEach(function(value, key){
-                object[key] = value;
-            });            
-
-            fetch('server.php', {
-              method: "POST",
-              headers: {
-                'Content-type': 'application/json'
-              },
-              body: JSON.stringify(object)
-            })            
+            const json = JSON.stringify(Object.fromEntries(formData.entries()));
+             
+            postData('http://localhost:3000/requests', json)                      
             .then(data => {
                 console.log(data);
                 showThanskModal(message.success);                                  
@@ -294,11 +280,59 @@ class MenuCard {
 
 //////////////////////////////NPM//////////////////////////////
 
-fetch('http://localhost:3000/menu  ')
+fetch('http://localhost:3000/menu')
     .then(data => data.json())
     .then(res => console.log(res));
 
+//////////////////////////////Slider//////////////////////////////
 
+const slides = document.querySelectorAll('.offer__slide'),
+      prev = document.querySelector('.offer__slider-prev'),
+      next = document.querySelector('.offer__slider-next'),
+      total = document.querySelector('#total'),
+      current = document.querySelector('#current');
+
+let slideIndex = 1;
+showSlides(slideIndex);
+
+if (slides.length < 10) {
+  total.textContent = `0${slides.length}`;
+}else {
+  total.textContent = slides.length;
+}
+
+function showSlides(n) {
+  if (n > slides.length) {
+    slideIndex = 1;
+  }
+
+  if (n < 1) {
+    slideIndex = slides.length;
+  }
+
+  slides.forEach(item => item.style.display = 'none');
+
+  slides[slideIndex - 1].style.display = 'block';
+
+  if (slides.length < 10) {
+    current.textContent = `0${slideIndex}`;
+  }else {
+    current.textContent = slideIndex;
+  }
+}
+
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+prev.addEventListener('click', () => {
+  plusSlides(-1);
+});
+
+next.addEventListener('click', () => {
+  plusSlides(1);
+});
 
 
 
